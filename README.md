@@ -9,7 +9,7 @@ Sleek, minimalist, animated personal portfolio built with React + Vite + Tailwin
 - Dark cinematic / terminal aesthetic
 - Fully responsive design
 - Scroll animations & animated stat counters
-- AI chat assistant (DeepSeek via Vercel serverless)
+- AI chat assistant (Google Gemini via Vercel serverless)
 - Free hosting on GitHub Pages
 
 ## Local Development
@@ -41,8 +41,8 @@ The live portfolio stays on **GitHub Pages**. Vercel only hosts `api/chat.ts` (s
 
 1. Link locally: `npx vercel link --yes --scope <team> --project portfolio`
 2. Add environment variables in the [Vercel dashboard](https://vercel.com):
-   - `DEEPSEEK_API_KEY` — your DeepSeek API key from [platform.deepseek.com](https://platform.deepseek.com)
-   - `DEEPSEEK_MODEL` — `deepseek-reasoner` (default) or `deepseek-chat`
+   - `GEMINI_API_KEY` — from [Google AI Studio](https://aistudio.google.com/apikey)
+   - `GEMINI_MODEL` — `gemini-2.5-flash` (default, free tier) or `gemini-2.5-pro`
 3. Deploy API: `npx vercel deploy --prod`
 4. Copy the production `/api/chat` URL (e.g. `https://portfolio-….vercel.app/api/chat`).
 5. Set that URL as `VITE_CHAT_API_URL` in GitHub repo secrets (step 1.3 above).

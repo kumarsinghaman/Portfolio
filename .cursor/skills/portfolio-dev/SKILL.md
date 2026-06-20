@@ -45,7 +45,7 @@ Confirm `resume.pdf`, favicon, and headshot resolve under `/Portfolio/…`, not 
 
 ## Chat API (optional)
 
-- Deploy `api/chat.ts` to Vercel with `DEEPSEEK_API_KEY`.
+- Deploy `api/chat.ts` to Vercel with `GEMINI_API_KEY`.
 - Set GitHub secret `VITE_CHAT_API_URL` for Pages builds.
 
 ## Cursor config

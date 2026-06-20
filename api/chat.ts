@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { CHAT_SYSTEM_PROMPT } from '../src/data/chatPrompt.js'
 
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions'
-const DEFAULT_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-reasoner'
+const GEMINI_API_URL =
+  'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
+const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash'
 
 const ALLOWED_ORIGINS = [
   'https://kumarsinghaman.github.io',
@@ -35,9 +36,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const apiKey = process.env.DEEPSEEK_API_KEY
+  const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
-    return res.status(500).json({ error: 'DEEPSEEK_API_KEY not configured' })
+    return res.status(500).json({ error: 'GEMINI_API_KEY not configured' })
   }
 
   const { messages } = req.body as { messages?: ChatMessage[] }
@@ -52,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }))
 
   try {
-    const response = await fetch(DEEPSEEK_API_URL, {
+    const response = await fetch(GEMINI_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -69,7 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!response.ok) {
       const errText = await response.text()
-      console.error('DeepSeek API error:', response.status, errText)
+      console.error('Gemini API error:', response.status, errText)
       return res.status(response.status).json({ error: 'LLM API error' })
     }
 
