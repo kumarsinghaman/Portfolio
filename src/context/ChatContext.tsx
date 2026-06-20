@@ -1,38 +1,13 @@
+import { useCallback, useRef, useState, type ReactNode } from 'react'
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react'
-
-interface Message {
-  role: 'user' | 'assistant'
-  content: string
-}
-
-interface ChatContextValue {
-  open: boolean
-  messages: Message[]
-  input: string
-  streaming: boolean
-  error: string | null
-  setOpen: (open: boolean) => void
-  setInput: (value: string) => void
-  sendMessage: (text: string) => Promise<void>
-  openWithQuestion: (question: string) => void
-  toggleChat: () => void
-  inputRef: React.RefObject<HTMLInputElement | null>
-}
-
-const ChatContext = createContext<ChatContextValue | null>(null)
-
-const CHAT_API_URL = import.meta.env.VITE_CHAT_API_URL || '/api/chat'
+  CHAT_API_URL,
+  ChatContext,
+  type ChatMessage,
+} from './chat-context'
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -42,14 +17,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     async (text: string) => {
       if (!text.trim() || streaming) return
 
-      const userMsg: Message = { role: 'user', content: text.trim() }
+      const userMsg: ChatMessage = { role: 'user', content: text.trim() }
       const updated = [...messages, userMsg]
       setMessages(updated)
       setInput('')
       setStreaming(true)
       setError(null)
 
-      const assistantMsg: Message = { role: 'assistant', content: '' }
+      const assistantMsg: ChatMessage = { role: 'assistant', content: '' }
       setMessages([...updated, assistantMsg])
 
       try {
@@ -137,10 +112,4 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       {children}
     </ChatContext.Provider>
   )
-}
-
-export function useChat() {
-  const ctx = useContext(ChatContext)
-  if (!ctx) throw new Error('useChat must be used within ChatProvider')
-  return ctx
 }

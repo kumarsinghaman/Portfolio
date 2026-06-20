@@ -2,7 +2,7 @@
 
 Sleek, minimalist, animated personal portfolio built with React + Vite + Tailwind + Framer Motion.
 
-**Live site:** [kumarsinghaman.github.io](https://kumarsinghaman.github.io)
+**Live site:** [kumarsinghaman.github.io/Portfolio](https://kumarsinghaman.github.io/Portfolio/)
 
 ## Features
 
@@ -27,12 +27,13 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ### 1. GitHub Pages (static site)
 
-1. Create a repo named `kumarsinghaman.github.io` on GitHub.
-2. Push this code to the `main` branch.
-3. Go to **Settings → Pages → Build and deployment → Source** and select **GitHub Actions**.
-4. Add a repository secret:
+This repo deploys to `https://kumarsinghaman.github.io/Portfolio/` via GitHub Actions (`.github/workflows/deploy.yml`).
+
+1. Push to the `main` branch.
+2. Ensure **Settings → Pages → Build and deployment → Source** is **GitHub Actions**.
+3. Add a repository secret:
    - `VITE_CHAT_API_URL` = your Vercel chat API URL (e.g. `https://your-project.vercel.app/api/chat`)
-5. Push to `main` — the site deploys automatically.
+4. Push to `main` — the site redeploys automatically.
 
 ### 2. Vercel (chat API)
 
@@ -45,7 +46,7 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ### 3. Custom assets
 
-- **Headshot:** Replace `public/headshot.svg` with your photo (`headshot.jpg` or `headshot.png`) and update the `src` in `src/sections/About.tsx`.
+- **Headshot:** Replace `public/headshot.svg` with your photo and keep using `publicAsset('headshot.svg')` in `src/sections/About.tsx`.
 - **Resume:** Replace `public/resume.pdf` with an updated version.
 - **Project links:** Edit `src/data/profile.ts` — set `repo` and `demo` URLs on project entries.
 

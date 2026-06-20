@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { CHAT_SUGGESTIONS } from '../data/chatSuggestions'
-import { useChat } from '../context/ChatContext'
+import { useChat } from '../hooks/useChat'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
 const MIN_LENGTH = 3

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react'
 import { CHAT_SUGGESTIONS } from '../data/chatSuggestions'
-import { useChat } from '../context/ChatContext'
+import { useChat } from '../hooks/useChat'
 
 export function ChatWidget() {
   const {
