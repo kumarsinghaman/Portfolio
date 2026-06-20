@@ -21,4 +21,10 @@ export interface ChatContextValue {
 
 export const ChatContext = createContext<ChatContextValue | null>(null)
 
-export const CHAT_API_URL = import.meta.env.VITE_CHAT_API_URL || '/api/chat'
+const PRODUCTION_CHAT_API_URL =
+  'https://portfolio-two-ruddy-m4gutm4tn2.vercel.app/api/chat'
+
+/** Empty GitHub Actions secrets override .env.production — treat blank as unset. */
+export const CHAT_API_URL =
+  import.meta.env.VITE_CHAT_API_URL?.trim() ||
+  (import.meta.env.PROD ? PRODUCTION_CHAT_API_URL : '/api/chat')
