@@ -30,3 +30,45 @@ dist-ssr
 
 # Original resume source (public/resume.pdf is the deployed copy)
 Aman_Kumar_Singh_-_Senior_Software_Engineer_v2 2.pdf
+
+# ECC extras not used in this TS/React portfolio (safe to keep locally)
+.cursor/rules/golang-*
+.cursor/rules/php-*
+.cursor/rules/python-*
+.cursor/rules/kotlin-*
+.cursor/rules/swift-*
+.cursor/skills/article-writing/
+.cursor/skills/bun-runtime/
+.cursor/skills/content-engine/
+.cursor/skills/frontend-slides/
+.cursor/skills/investor-materials/
+.cursor/skills/investor-outreach/
+.cursor/skills/market-research/
+.cursor/skills/mcp-server-patterns/
+.cursor/skills/nextjs-turbopack/
+scripts/hooks/*
+!scripts/hooks/block-no-verify.js
+!scripts/hooks/check-console-log.js
+!scripts/hooks/cost-tracker.js
+!scripts/hooks/design-quality-check.js
+!scripts/hooks/evaluate-session.js
+!scripts/hooks/post-edit-accumulator.js
+!scripts/hooks/post-edit-console-warn.js
+!scripts/hooks/post-edit-format.js
+!scripts/hooks/pre-compact.js
+!scripts/hooks/session-end-marker.js
+!scripts/hooks/session-end.js
+!scripts/hooks/session-start.js
+scripts/lib/*
+!scripts/lib/agent-data-home.js
+!scripts/lib/observer-sessions.js
+!scripts/lib/package-manager.js
+!scripts/lib/project-detect.js
+!scripts/lib/resolve-formatter.js
+!scripts/lib/session-aliases.js
+!scripts/lib/session-bridge.js
+!scripts/lib/shell-split.js
+!scripts/lib/utils.js
+scripts/lib/*/
+scripts/*.py
+scripts/*.sh

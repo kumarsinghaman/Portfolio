@@ -1,0 +1,19 @@
+---
+description: Test bug fixes locally before commit or push
+alwaysApply: true
+---
+
+# Test fixes before finalizing
+
+When the user asks to **fix** something (bug, broken feature, deploy issue, regression):
+
+1. Implement the fix with a minimal, focused diff.
+2. **Do not commit or push until the fix is verified.**
+3. Run appropriate verification:
+   - UI: dev server + browser check at relevant breakpoints.
+   - Build/deploy issues: production build with deploy-equivalent env (e.g. `VITE_BASE_PATH`, GitHub Pages base path).
+   - Backend/scripts: targeted command, test, or log output.
+4. Summarize what was tested (command/URL, result).
+5. Commit/push only when the user explicitly requests it, or after they confirm the local check passed.
+
+If verification is blocked, report the blocker and what the user should confirm — do not push unverified fixes.

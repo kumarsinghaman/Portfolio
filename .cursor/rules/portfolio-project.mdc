@@ -1,0 +1,35 @@
+---
+description: Portfolio repo context — stack, GitHub Pages base path, assets, and verification commands
+alwaysApply: true
+---
+
+# Portfolio project context
+
+Personal portfolio for **Aman Kumar Singh**. React 19 + Vite + TypeScript + Tailwind + Framer Motion.
+
+## Deploy paths
+
+- **Live:** `https://kumarsinghaman.github.io/Portfolio/`
+- GitHub Pages uses base path `/Portfolio/` (set via `VITE_BASE_PATH` in `.github/workflows/deploy.yml`).
+- Never link public files with root-absolute paths like `/resume.pdf`. Use `publicAsset()` from `src/utils/publicAsset.ts`.
+
+## Key commands
+
+```bash
+npm run dev              # local dev (base /)
+npm run build            # production build
+VITE_BASE_PATH=/Portfolio/ npm run build   # match GitHub Pages locally
+npm run verify:cursor    # validate hooks, rules, skills
+```
+
+## Content & config
+
+- Profile data: `src/data/profile.ts`
+- Chat prompt: `src/data/chatPrompt.ts`; API: `api/chat.ts` (Vercel), env `DEEPSEEK_API_KEY`
+- Resume: `public/resume.pdf`
+
+## Agent behavior in this repo
+
+- Match existing dark terminal aesthetic and section patterns.
+- Keep diffs minimal; do not refactor unrelated code.
+- When fixing bugs: test locally before commit/push (see `test-fixes-before-finalizing.mdc`).
