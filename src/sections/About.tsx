@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { profile } from '../data/profile'
 import { SectionHeading } from '../components/SectionHeading'
 import { useInView } from '../hooks/useInView'
+import { publicAsset } from '../utils/publicAsset'
 
 export function About() {
   const { ref, inView } = useInView(0.2)
@@ -43,7 +44,7 @@ export function About() {
           >
             <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-surface glow-accent">
               <img
-                src="/headshot.svg"
+                src={publicAsset('headshot.svg')}
                 alt={profile.name}
                 className="h-full w-full object-cover"
               />

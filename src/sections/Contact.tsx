@@ -3,6 +3,7 @@ import { Mail, Linkedin, Phone, Download } from 'lucide-react'
 import { profile } from '../data/profile'
 import { SectionHeading } from '../components/SectionHeading'
 import { useInView } from '../hooks/useInView'
+import { publicAsset } from '../utils/publicAsset'
 
 export function Contact() {
   const { ref, inView } = useInView(0.2)
@@ -50,7 +51,7 @@ export function Contact() {
           </div>
 
           <a
-            href="/resume.pdf"
+            href={publicAsset('resume.pdf')}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded border border-accent bg-accent/10 px-6 py-3 font-mono text-sm uppercase tracking-wider text-accent transition-all hover:bg-accent/20"
