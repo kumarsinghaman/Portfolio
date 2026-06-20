@@ -35,14 +35,19 @@ This repo deploys to `https://kumarsinghaman.github.io/Portfolio/` via GitHub Ac
    - `VITE_CHAT_API_URL` = your Vercel chat API URL (e.g. `https://your-project.vercel.app/api/chat`)
 4. Push to `main` — the site redeploys automatically.
 
-### 2. Vercel (chat API)
+### 2. Vercel (chat API only)
 
-1. Import the same repo into [Vercel](https://vercel.com).
-2. Add environment variables in the Vercel dashboard:
+The live portfolio stays on **GitHub Pages**. Vercel only hosts `api/chat.ts` (see `vercel.json`: `framework: null`, no Vite build).
+
+1. Link locally: `npx vercel link --yes --scope <team> --project portfolio`
+2. Add environment variables in the [Vercel dashboard](https://vercel.com):
    - `DEEPSEEK_API_KEY` — your DeepSeek API key from [platform.deepseek.com](https://platform.deepseek.com)
    - `DEEPSEEK_MODEL` — `deepseek-reasoner` (default) or `deepseek-chat`
-3. Deploy. Copy the `/api/chat` URL.
-4. Set that URL as `VITE_CHAT_API_URL` in GitHub repo secrets (step 1.4 above).
+3. Deploy API: `npx vercel deploy --prod`
+4. Copy the production `/api/chat` URL (e.g. `https://portfolio-….vercel.app/api/chat`).
+5. Set that URL as `VITE_CHAT_API_URL` in GitHub repo secrets (step 1.3 above).
+
+**Note:** Disable or bypass Vercel Deployment Protection on production if the GitHub Pages site must call the API from browsers.
 
 ### 3. Custom assets
 

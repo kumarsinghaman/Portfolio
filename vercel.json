@@ -1,4 +1,16 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm ci",
+  "buildCommand": "node -e \"console.log('API-only deploy — static portfolio is on GitHub Pages')\"",
+  "outputDirectory": "api-public",
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://kumarsinghaman.github.io/Portfolio/",
+      "permanent": false
+    }
+  ],
   "functions": {
     "api/chat.ts": {
       "maxDuration": 30

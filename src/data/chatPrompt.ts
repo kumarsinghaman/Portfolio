@@ -1,4 +1,4 @@
-import { profile } from '../data/profile'
+import { profile } from './profile.js'
 
 export const CHAT_SYSTEM_PROMPT = `You are an AI assistant representing ${profile.name}, a ${profile.title} based in ${profile.location}.
 

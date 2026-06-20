@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { CHAT_SYSTEM_PROMPT } from '../src/data/chatPrompt'
+import { CHAT_SYSTEM_PROMPT } from '../src/data/chatPrompt.js'
 
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions'
 const DEFAULT_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-reasoner'

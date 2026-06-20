@@ -25,7 +25,7 @@ npm run verify:cursor    # validate hooks, rules, skills
 ## Content & config
 
 - Profile data: `src/data/profile.ts`
-- Chat prompt: `src/data/chatPrompt.ts`; API: `api/chat.ts` (Vercel), env `DEEPSEEK_API_KEY`
+- Chat prompt: `src/data/chatPrompt.ts`; API: `api/chat.ts` on Vercel (**API-only** — `vercel.json` skips Vite build; static site is GitHub Pages), env `DEEPSEEK_API_KEY`
 - Resume: `public/resume.pdf`
 
 ## Agent behavior in this repo

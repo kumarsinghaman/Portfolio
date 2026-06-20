@@ -1,0 +1,4 @@
+.cursor
+scripts
+dist
+node_modules/.cache
