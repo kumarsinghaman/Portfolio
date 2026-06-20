@@ -1,112 +1,36 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react'
-
-interface Message {
-  role: 'user' | 'assistant'
-  content: string
-}
-
-const CHAT_API_URL = import.meta.env.VITE_CHAT_API_URL || '/api/chat'
-
-const SUGGESTIONS = [
-  'What does Aman do?',
-  'Tell me about his AI projects',
-  'What tech stack does he use?',
-  'Is he open to opportunities?',
-]
+import { CHAT_SUGGESTIONS } from '../data/chatSuggestions'
+import { useChat } from '../context/ChatContext'
 
 export function ChatWidget() {
-  const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [streaming, setStreaming] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const {
+    open,
+    setOpen,
+    messages,
+    input,
+    setInput,
+    sendMessage,
+    streaming,
+    error,
+    toggleChat,
+    inputRef,
+  } = useChat()
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages, scrollToBottom])
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, streaming])
 
   useEffect(() => {
     if (open) inputRef.current?.focus()
-  }, [open])
-
-  const sendMessage = async (text: string) => {
-    if (!text.trim() || streaming) return
-
-    const userMsg: Message = { role: 'user', content: text.trim() }
-    const updated = [...messages, userMsg]
-    setMessages(updated)
-    setInput('')
-    setStreaming(true)
-    setError(null)
-
-    const assistantMsg: Message = { role: 'assistant', content: '' }
-    setMessages([...updated, assistantMsg])
-
-    try {
-      const res = await fetch(CHAT_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updated }),
-      })
-
-      if (!res.ok) {
-        throw new Error(`API error: ${res.status}`)
-      }
-
-      const reader = res.body?.getReader()
-      if (!reader) throw new Error('No stream')
-
-      const decoder = new TextDecoder()
-      let buffer = ''
-      let accumulated = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
-        buffer = lines.pop() || ''
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue
-          const data = line.slice(6).trim()
-          if (data === '[DONE]') continue
-          try {
-            const parsed = JSON.parse(data)
-            if (parsed.content) {
-              accumulated += parsed.content
-              setMessages((prev) => {
-                const copy = [...prev]
-                copy[copy.length - 1] = { role: 'assistant', content: accumulated }
-                return copy
-              })
-            }
-          } catch {
-            // skip
-          }
-        }
-      }
-    } catch (err) {
-      console.error('Chat error:', err)
-      setError('Unable to reach the AI assistant. Please try again later.')
-      setMessages((prev) => prev.slice(0, -1))
-    } finally {
-      setStreaming(false)
-    }
-  }
+  }, [open, inputRef])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    sendMessage(input)
+    void sendMessage(input)
   }
 
   return (
@@ -140,10 +64,10 @@ export function ChatWidget() {
                     Hi! Ask me anything about Aman's experience, projects, or skills.
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {SUGGESTIONS.map((s) => (
+                    {CHAT_SUGGESTIONS.map((s) => (
                       <button
                         key={s}
-                        onClick={() => sendMessage(s)}
+                        onClick={() => void sendMessage(s)}
                         className="rounded border border-border px-3 py-1.5 font-mono text-xs text-muted transition-colors hover:border-accent/40 hover:text-accent"
                       >
                         {s}
@@ -165,18 +89,17 @@ export function ChatWidget() {
                         : 'bg-surface border border-border text-muted'
                     }`}
                   >
-                    {msg.content || (streaming && i === messages.length - 1 ? (
-                      <Loader2 size={16} className="animate-spin text-accent" />
-                    ) : null)}
+                    {msg.content ||
+                      (streaming && i === messages.length - 1 ? (
+                        <Loader2 size={16} className="animate-spin text-accent" />
+                      ) : null)}
                   </div>
                 </div>
               ))}
 
-              {error && (
-                <p className="text-center text-xs text-red-400">{error}</p>
-              )}
+              {error && <p className="text-center text-xs text-red-400">{error}</p>}
 
-              <div ref={messagesEndRef} />
+              <div ref={bottomRef} />
             </div>
 
             <form onSubmit={handleSubmit} className="border-t border-border p-3">
@@ -196,7 +119,11 @@ export function ChatWidget() {
                   className="flex h-10 w-10 items-center justify-center rounded border border-accent/50 bg-accent/10 text-accent transition-all hover:bg-accent/20 disabled:opacity-40"
                   aria-label="Send message"
                 >
-                  {streaming ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  {streaming ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Send size={16} />
+                  )}
                 </button>
               </div>
             </form>
@@ -205,7 +132,7 @@ export function ChatWidget() {
       </AnimatePresence>
 
       <motion.button
-        onClick={() => setOpen(!open)}
+        onClick={toggleChat}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full border border-accent/50 bg-bg px-4 py-3 font-mono text-sm text-accent shadow-lg glow-accent transition-all hover:bg-accent/10 sm:right-6"

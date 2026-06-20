@@ -1,6 +1,7 @@
 import { BackgroundFX } from './components/BackgroundFX'
 import { Nav } from './components/Nav'
 import { ChatWidget } from './components/ChatWidget'
+import { ChatProvider } from './context/ChatContext'
 import { Hero } from './sections/Hero'
 import { Stats } from './sections/Stats'
 import { About } from './sections/About'
@@ -12,7 +13,7 @@ import { Contact } from './sections/Contact'
 
 function App() {
   return (
-    <>
+    <ChatProvider>
       <BackgroundFX />
       <Nav />
       <main>
@@ -26,7 +27,7 @@ function App() {
         <Contact />
       </main>
       <ChatWidget />
-    </>
+    </ChatProvider>
   )
 }
 

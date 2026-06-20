@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
+import { HeroAskBox } from '../components/HeroAskBox'
 import { profile } from '../data/profile'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
@@ -97,18 +98,18 @@ export function Hero() {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="text-5xl font-bold tracking-tighter sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-none"
         >
-          <GlitchText text={profile.name.split(' ')[0]} />
-          <br />
-          <span className="text-gradient">
-            <GlitchText text={profile.name.split(' ').slice(1).join(' ')} />
+          <span className="block">
+            <GlitchText text={profile.name.split(' ')[0]} />
           </span>
         </motion.h1>
+
+        <HeroAskBox />
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-8 h-8 text-lg sm:text-xl"
+          className="mt-6 h-8 text-lg sm:text-xl"
         >
           <Typewriter texts={profile.taglines} />
         </motion.div>
