@@ -21,12 +21,12 @@ export function Contact() {
           ref={ref}
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          className="mx-auto flex max-w-xl flex-col items-center gap-6"
+          className="mx-auto flex w-full flex-col items-center gap-6"
         >
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-3 md:flex-nowrap md:gap-4">
             <a
               href={`mailto:${profile.email}`}
-              className="flex items-center gap-2 rounded border border-border px-5 py-3 font-mono text-sm transition-all hover:border-accent/40 hover:text-accent"
+              className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded border border-border px-4 py-3 font-mono text-sm transition-all hover:border-accent/40 hover:text-accent sm:px-5"
             >
               <Mail size={16} />
               {profile.email}
@@ -35,14 +35,14 @@ export function Contact() {
               href={profile.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded border border-border px-5 py-3 font-mono text-sm transition-all hover:border-accent/40 hover:text-accent"
+              className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded border border-border px-4 py-3 font-mono text-sm transition-all hover:border-accent/40 hover:text-accent sm:px-5"
             >
               <Linkedin size={16} />
               LinkedIn
             </a>
             <a
               href={`tel:${profile.phone.replace(/\s/g, '')}`}
-              className="flex items-center gap-2 rounded border border-border px-5 py-3 font-mono text-sm transition-all hover:border-accent/40 hover:text-accent"
+              className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded border border-border px-4 py-3 font-mono text-sm transition-all hover:border-accent/40 hover:text-accent sm:px-5"
             >
               <Phone size={16} />
               {profile.phone}

@@ -29,7 +29,11 @@ export function SectionHeading({
         {title}
       </h2>
       {subtitle && (
-        <p className="mt-4 max-w-2xl text-muted text-lg">{subtitle}</p>
+        <p
+          className={`mt-4 max-w-2xl text-muted text-lg ${align === 'center' ? 'mx-auto' : ''}`}
+        >
+          {subtitle}
+        </p>
       )}
     </motion.div>
   )
