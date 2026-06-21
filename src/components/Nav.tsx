@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { profile } from '../data/profile'
 import { scrollToSectionAfterMenuClose } from '../utils/scrollToSection'
 
 export function Nav() {
+  const headerRef = useRef<HTMLElement>(null)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -19,6 +20,21 @@ export function Nav() {
     return () => {
       document.body.style.overflow = ''
     }
+  }, [mobileOpen])
+
+  useEffect(() => {
+    if (!mobileOpen) return
+
+    const closeMenu = () => setMobileOpen(false)
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) {
+        closeMenu()
+      }
+    }
+
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
   }, [mobileOpen])
 
   const handleNavClick = (href: string) => {
@@ -42,6 +58,7 @@ export function Nav() {
 
   return (
     <motion.header
+      ref={headerRef}
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
