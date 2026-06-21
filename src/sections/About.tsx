@@ -44,7 +44,7 @@ export function About() {
           >
             <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-surface glow-accent">
               <img
-                src={publicAsset('headshot.svg')}
+                src={publicAsset('headshot.jpg')}
                 alt={profile.name}
                 className="h-full w-full object-cover"
               />

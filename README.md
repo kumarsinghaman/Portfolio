@@ -51,7 +51,7 @@ The live portfolio stays on **GitHub Pages**. Vercel only hosts `api/chat.ts` (s
 
 ### 3. Custom assets
 
-- **Headshot:** Replace `public/headshot.svg` with your photo and keep using `publicAsset('headshot.svg')` in `src/sections/About.tsx`.
+- **Headshot:** `public/headshot.jpg` (referenced via `publicAsset('headshot.jpg')` in `src/sections/About.tsx`).
 - **Resume:** Replace `public/resume.pdf` with an updated version.
 - **Project links:** Edit `src/data/profile.ts` — set `repo` and `demo` URLs on project entries.
 
@@ -67,7 +67,7 @@ api/
   chat.ts              # Vercel serverless DeepSeek proxy
 public/
   resume.pdf           # Downloadable resume
-  headshot.svg         # Profile photo placeholder
+  headshot.jpg         # Profile photo
 ```
 
 ## Tech Stack
