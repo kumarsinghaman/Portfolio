@@ -6,6 +6,7 @@ interface SectionHeadingProps {
   title: string
   subtitle?: string
   align?: 'left' | 'center'
+  className?: string
 }
 
 export function SectionHeading({
@@ -13,6 +14,7 @@ export function SectionHeading({
   title,
   subtitle,
   align = 'left',
+  className = '',
 }: SectionHeadingProps) {
   const { ref, inView } = useInView()
 
@@ -22,7 +24,7 @@ export function SectionHeading({
       initial={{ opacity: 0, y: 30 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6 }}
-      className={`mb-12 md:mb-16 ${align === 'center' ? 'text-center' : ''}`}
+      className={`mb-12 md:mb-16 ${align === 'center' ? 'text-center' : ''} ${className}`}
     >
       <p className="mono-label mb-3 text-accent">{label}</p>
       <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl uppercase">
