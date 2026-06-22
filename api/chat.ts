@@ -1,6 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { CHAT_SYSTEM_PROMPT } from '../src/data/chatPrompt.js'
 
+import { incrementQuestionCount } from './lib/redis.js'
+
 const GEMINI_API_URL =
   'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
 const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash'
@@ -9,6 +11,8 @@ const ALLOWED_ORIGINS = [
   'https://kumarsinghaman.github.io',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
 ]
 
 function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
@@ -51,6 +55,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .filter((m) => m.role === 'user' || m.role === 'assistant')
     .slice(-10)
     .map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }))
+
+  const latestUserMessage = [...sanitized].reverse().find((m) => m.role === 'user')
+  if (latestUserMessage) {
+    void incrementQuestionCount(latestUserMessage.content)
+  }
 
   try {
     const response = await fetch(GEMINI_API_URL, {

@@ -5,6 +5,7 @@ import { HeroAskBox } from '../components/HeroAskBox'
 import { profile } from '../data/profile'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { publicAsset } from '../utils/publicAsset'
+import { trackResumeDownload } from '../lib/analytics'
 
 function Typewriter({ texts }: { texts: readonly string[] }) {
   const reduced = useReducedMotion()
@@ -131,6 +132,7 @@ export function Hero() {
             href={publicAsset(profile.resumeFile)}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackResumeDownload('hero')}
             className="rounded border border-border px-6 py-3 font-mono text-sm uppercase tracking-wider text-muted transition-all hover:border-accent/40 hover:text-accent"
           >
             Download Resume

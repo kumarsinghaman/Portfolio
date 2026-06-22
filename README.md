@@ -10,6 +10,7 @@ Sleek, minimalist, animated personal portfolio built with React + Vite + Tailwin
 - Fully responsive design
 - Scroll animations & animated stat counters
 - AI chat assistant (Google Gemini via Vercel serverless)
+- Free analytics (GoatCounter + Upstash Redis)
 - Free hosting on GitHub Pages
 
 ## Local Development
@@ -49,7 +50,48 @@ The live portfolio stays on **GitHub Pages**. Vercel only hosts `api/chat.ts` (s
 
 **Note:** Disable or bypass Vercel Deployment Protection on production if the GitHub Pages site must call the API from browsers.
 
-### 3. Custom assets
+### 3. Analytics (free)
+
+**One dashboard on Vercel** (after env vars are set):
+
+```
+https://your-project.vercel.app/api/dashboard?token=YOUR_STATS_SECRET
+```
+
+Shows page views, resume download clicks, and top 5 AI questions (last 30 days).
+
+| What | Tool | Where to view |
+|------|------|----------------|
+| Page visits | [GoatCounter](https://www.goatcounter.com) (free) | `/api/dashboard` or GoatCounter site |
+| Resume downloads | GoatCounter events | `/api/dashboard` |
+| Top 5 AI questions | [Upstash Redis](https://upstash.com) (free tier) | `/api/dashboard` |
+
+**GoatCounter (GitHub Pages + Vercel dashboard):**
+
+1. Create a free site at [goatcounter.com](https://www.goatcounter.com).
+2. Add GitHub secret `VITE_GOATCOUNTER_ENDPOINT` = `https://YOURCODE.goatcounter.com/count`
+3. In GoatCounter → **API**, create a key and add to **Vercel**:
+   - `GOATCOUNTER_API_HOST` = `https://YOURCODE.goatcounter.com`
+   - `GOATCOUNTER_API_KEY` = your API key
+4. Redeploy GitHub Pages and Vercel.
+
+**Upstash (AI questions):**
+
+1. Create a free Redis database at [console.upstash.com](https://console.upstash.com).
+2. In Vercel → Environment Variables, add:
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+   - `STATS_SECRET` — bookmark this in your dashboard URL
+3. Redeploy Vercel.
+
+**JSON API (same data):**
+
+```bash
+curl -s -H "Authorization: Bearer YOUR_STATS_SECRET" \
+  https://your-project.vercel.app/api/stats
+```
+
+### 4. Custom assets
 
 - **Headshot:** `public/headshot.jpg` (referenced via `publicAsset('headshot.jpg')` in `src/sections/About.tsx`).
 - **Resume:** `public/Aman_Kumar_Singh_-_Senior_Software_Engineer.pdf` (linked via `profile.resumeFile` in Hero and Contact).
@@ -64,7 +106,11 @@ src/
   sections/            # Page sections
   components/          # Reusable UI components
 api/
-  chat.ts              # Vercel serverless DeepSeek proxy
+  chat.ts              # Vercel Gemini chat proxy (logs questions to Upstash)
+  dashboard.ts         # Unified HTML stats dashboard (private)
+  stats.ts             # Unified JSON stats API (private)
+  lib/redis.ts         # Upstash helpers
+  lib/goatcounter.ts   # GoatCounter API helpers
 public/
   Aman_Kumar_Singh_-_Senior_Software_Engineer.pdf  # Downloadable resume
   headshot.jpg         # Profile photo
@@ -76,7 +122,8 @@ public/
 - Tailwind CSS
 - Framer Motion
 - Lucide React icons
-- DeepSeek API (chat)
+- Google Gemini API (chat)
+- GoatCounter + Upstash (analytics)
 - GitHub Pages + Vercel
 
 ## License
