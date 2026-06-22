@@ -82,11 +82,14 @@ function formatGcDate(date: Date): string {
   return date.toISOString().replace(/\.\d{3}Z$/, 'Z')
 }
 
-function dateRange(days: number): { start: string; end: string } {
+function dateRange(days: number, since?: Date | null): { start: string; end: string } {
   const end = new Date()
   const start = new Date()
   start.setUTCDate(start.getUTCDate() - days)
   start.setUTCHours(0, 0, 0, 0)
+  if (since && since > start) {
+    start.setTime(since.getTime())
+  }
   end.setUTCHours(23, 59, 59, 0)
   return { start: formatGcDate(start), end: formatGcDate(end) }
 }
@@ -124,13 +127,16 @@ export async function probeGoatCounter(periodDays = 30): Promise<Record<string, 
   }
 }
 
-export async function getGoatCounterTotals(periodDays = 30): Promise<GoatCounterTotals> {
+export async function getGoatCounterTotals(
+  periodDays = 30,
+  since?: Date | null,
+): Promise<GoatCounterTotals> {
   if (!isConfigured()) {
     return { pageviews: 0, events: 0, periodDays, configured: false }
   }
 
   try {
-    const { start, end } = dateRange(periodDays)
+    const { start, end } = dateRange(periodDays, since)
     const data = await gcFetch<{
       total?: number
       total_events?: number
@@ -159,13 +165,16 @@ const RESUME_PATHS: { path: string; source: ResumeDownloadStat['source']; label:
   { path: 'resume-download/contact', source: 'contact', label: 'Contact section' },
 ]
 
-export async function getResumeDownloadStats(periodDays = 30): Promise<GoatCounterResumeStats> {
+export async function getResumeDownloadStats(
+  periodDays = 30,
+  since?: Date | null,
+): Promise<GoatCounterResumeStats> {
   if (!isConfigured()) {
     return { downloads: [], total: 0, configured: false }
   }
 
   try {
-    const { start, end } = dateRange(periodDays)
+    const { start, end } = dateRange(periodDays, since)
     const data = await gcFetch<{
       hits?: { path?: string; count?: number; event?: boolean }[]
     }>('/stats/hits', {

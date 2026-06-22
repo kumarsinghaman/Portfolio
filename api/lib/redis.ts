@@ -1,4 +1,5 @@
 const QUESTIONS_KEY = 'portfolio:chat-questions'
+const CLEARED_AT_KEY = 'portfolio:stats-cleared-at'
 
 async function redisCommand<T = unknown>(command: unknown[]): Promise<T | null> {
   const url = process.env.UPSTASH_REDIS_REST_URL
@@ -56,4 +57,28 @@ export async function getTopQuestions(limit = 5): Promise<QuestionStat[]> {
     })
   }
   return stats
+}
+
+export async function getStatsClearedAt(): Promise<Date | null> {
+  const value = await redisCommand<string>(['GET', CLEARED_AT_KEY])
+  if (!value) return null
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+export async function clearPortfolioStats(): Promise<{
+  questionsCleared: boolean
+  clearedAt: string
+  configured: boolean
+}> {
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  if (!url || !token) {
+    return { questionsCleared: false, clearedAt: '', configured: false }
+  }
+
+  const clearedAt = new Date().toISOString()
+  await redisCommand(['DEL', QUESTIONS_KEY])
+  await redisCommand(['SET', CLEARED_AT_KEY, clearedAt])
+  return { questionsCleared: true, clearedAt, configured: true }
 }

@@ -27,8 +27,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const stats = await getPortfolioStats(periodDays)
   const token = typeof req.query.token === 'string' ? req.query.token : ''
+  const cleared = req.query.cleared === '1'
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8')
   res.setHeader('Cache-Control', 'private, no-store')
-  return res.status(200).send(renderDashboardHtml(stats, token))
+  return res.status(200).send(renderDashboardHtml(stats, token, { cleared }))
 }
