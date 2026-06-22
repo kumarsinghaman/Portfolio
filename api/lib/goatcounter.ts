@@ -143,14 +143,15 @@ export async function getResumeDownloadStats(periodDays = 30): Promise<GoatCount
 
     const hitMap = new Map(
       (data.hits ?? [])
-        .filter((hit) => hit.event && hit.path?.startsWith('resume-download/'))
+        .filter((hit) => (hit.path ?? '').includes('resume-download'))
         .map((hit) => [hit.path ?? '', hit.count ?? 0]),
     )
 
     const downloads = RESUME_PATHS.map((item) => ({
       source: item.source,
       label: item.label,
-      count: hitMap.get(item.path) ?? 0,
+      count:
+        [...hitMap.entries()].find(([path]) => path.includes(item.path))?.[1] ?? 0,
     }))
 
     return {
