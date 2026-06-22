@@ -20,6 +20,9 @@
     },
     "api/dashboard.ts": {
       "maxDuration": 15
+    },
+    "api/clear-stats.ts": {
+      "maxDuration": 10
     }
   },
   "headers": [

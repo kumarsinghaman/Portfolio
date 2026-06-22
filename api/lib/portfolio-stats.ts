@@ -1,5 +1,5 @@
 import { getResumeDownloadStats, getGoatCounterTotals } from './goatcounter.js'
-import { getTopQuestions, type QuestionStat } from './redis.js'
+import { clearPortfolioStats, getStatsClearedAt, getTopQuestions, type QuestionStat } from './redis.js'
 
 export interface PortfolioStats {
   generatedAt: string
@@ -11,9 +11,10 @@ export interface PortfolioStats {
 }
 
 export async function getPortfolioStats(periodDays = 30): Promise<PortfolioStats> {
+  const clearedAt = await getStatsClearedAt()
   const [traffic, resume, topQuestions] = await Promise.all([
-    getGoatCounterTotals(periodDays),
-    getResumeDownloadStats(periodDays),
+    getGoatCounterTotals(periodDays, clearedAt),
+    getResumeDownloadStats(periodDays, clearedAt),
     getTopQuestions(5),
   ])
 
@@ -29,4 +30,8 @@ export async function getPortfolioStats(periodDays = 30): Promise<PortfolioStats
     topQuestions,
     upstashConfigured,
   }
+}
+
+export async function resetPortfolioStats() {
+  return clearPortfolioStats()
 }

@@ -17,7 +17,11 @@ function warningBlock(message: string): string {
   return `<p class="warn">${escapeHtml(message)}</p>`
 }
 
-export function renderDashboardHtml(stats: PortfolioStats, token: string): string {
+export function renderDashboardHtml(
+  stats: PortfolioStats,
+  token: string,
+  options: { cleared?: boolean } = {},
+): string {
   const period = stats.periodDays
   const generated = new Date(stats.generatedAt).toLocaleString()
 
@@ -208,7 +212,33 @@ export function renderDashboardHtml(stats: PortfolioStats, token: string): strin
         font-size: 0.78rem;
         text-transform: uppercase;
         letter-spacing: 0.08em;
+        background: transparent;
+        color: var(--accent);
+        cursor: pointer;
       }
+      .btn:hover { color: var(--accent2); }
+      .btn-danger {
+        border-color: #7a2e2e;
+        color: #ff8a8a;
+        background: rgba(255, 80, 80, 0.08);
+      }
+      .btn-danger:hover { color: #ffb4b4; border-color: #a33; }
+      .notice {
+        margin: 0 0 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #2d6a4f;
+        background: rgba(0, 229, 160, 0.08);
+        color: var(--accent);
+        font-size: 0.9rem;
+      }
+      .footer-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        align-items: center;
+      }
+      .clear-form { display: inline; margin: 0; }
     </style>
   </head>
   <body>
@@ -216,6 +246,8 @@ export function renderDashboardHtml(stats: PortfolioStats, token: string): strin
       <p class="eyebrow">Private · Vercel</p>
       <h1>Portfolio stats</h1>
       <p class="sub">All metrics in one place · updated ${escapeHtml(generated)}</p>
+
+      ${options.cleared ? '<p class="notice">All counters cleared. New visits and questions will be counted from now.</p>' : ''}
 
       <section class="card">
         <h2>Traffic</h2>
@@ -233,8 +265,18 @@ export function renderDashboardHtml(stats: PortfolioStats, token: string): strin
       </section>
 
       <div class="footer">
-        <a class="btn" href="/api/dashboard?token=${encodeURIComponent(token)}">Refresh</a>
-        <a class="btn" href="/api/stats?token=${encodeURIComponent(token)}">JSON</a>
+        <div class="footer-actions">
+          <a class="btn" href="/api/dashboard?token=${encodeURIComponent(token)}">Refresh</a>
+          <a class="btn" href="/api/stats?token=${encodeURIComponent(token)}">JSON</a>
+          <form
+            class="clear-form"
+            method="POST"
+            action="/api/clear-stats?token=${encodeURIComponent(token)}"
+            onsubmit="return confirm('Clear all portfolio stats? Traffic, resume downloads, and AI questions will reset to zero on this dashboard.')"
+          >
+            <button type="submit" class="btn btn-danger">Clear all</button>
+          </form>
+        </div>
         <span>Period: last ${period} days</span>
       </div>
     </div>
