@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react'
 import { CHAT_SUGGESTIONS } from '../data/chatSuggestions'
 import { useChat } from '../hooks/useChat'
+import { ChatMarkdown } from './ChatMarkdown'
 
 export function ChatWidget() {
   const {
@@ -46,7 +47,7 @@ export function ChatWidget() {
             <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-3">
               <div>
                 <p className="font-mono text-sm font-semibold text-accent">ASK AKS AI</p>
-                <p className="text-xs text-muted">Powered by DeepSeek</p>
+                <p className="text-xs text-muted">Powered by Gemini</p>
               </div>
               <button
                 onClick={() => setOpen(false)}
@@ -89,10 +90,14 @@ export function ChatWidget() {
                         : 'bg-surface border border-border text-muted'
                     }`}
                   >
-                    {msg.content ||
+                    {msg.role === 'assistant' && msg.content ? (
+                      <ChatMarkdown content={msg.content} />
+                    ) : (
+                      msg.content ||
                       (streaming && i === messages.length - 1 ? (
                         <Loader2 size={16} className="animate-spin text-accent" />
-                      ) : null)}
+                      ) : null)
+                    )}
                   </div>
                 </div>
               ))}
