@@ -79,6 +79,20 @@ export function renderDashboardHtml(
             .join('')}
         </ol>`
 
+  const toolbar = `
+        <div class="toolbar">
+          <a class="btn" href="/api/dashboard?token=${encodeURIComponent(token)}">Refresh</a>
+          <a class="btn" href="/api/stats?token=${encodeURIComponent(token)}">JSON</a>
+          <form
+            class="clear-form"
+            method="POST"
+            action="/api/clear-stats?token=${encodeURIComponent(token)}"
+            onsubmit="return confirm('Clear all portfolio stats? Traffic, resume downloads, and AI questions will reset to zero on this dashboard.')"
+          >
+            <button type="submit" class="btn btn-danger">Clear all</button>
+          </form>
+        </div>`
+
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -121,7 +135,14 @@ export function renderDashboardHtml(
         text-transform: uppercase;
         letter-spacing: -0.03em;
       }
-      .sub { color: var(--muted); margin: 0 0 2rem; }
+      .sub { color: var(--muted); margin: 0 0 1rem; }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
       .card {
         background: color-mix(in srgb, var(--surface) 88%, transparent);
         border: 1px solid var(--border);
@@ -232,12 +253,6 @@ export function renderDashboardHtml(
         color: var(--accent);
         font-size: 0.9rem;
       }
-      .footer-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.65rem;
-        align-items: center;
-      }
       .clear-form { display: inline; margin: 0; }
     </style>
   </head>
@@ -246,6 +261,8 @@ export function renderDashboardHtml(
       <p class="eyebrow">Private · Vercel</p>
       <h1>Portfolio stats</h1>
       <p class="sub">All metrics in one place · updated ${escapeHtml(generated)}</p>
+
+      ${toolbar}
 
       ${options.cleared ? '<p class="notice">All counters cleared. New visits and questions will be counted from now.</p>' : ''}
 
@@ -265,18 +282,6 @@ export function renderDashboardHtml(
       </section>
 
       <div class="footer">
-        <div class="footer-actions">
-          <a class="btn" href="/api/dashboard?token=${encodeURIComponent(token)}">Refresh</a>
-          <a class="btn" href="/api/stats?token=${encodeURIComponent(token)}">JSON</a>
-          <form
-            class="clear-form"
-            method="POST"
-            action="/api/clear-stats?token=${encodeURIComponent(token)}"
-            onsubmit="return confirm('Clear all portfolio stats? Traffic, resume downloads, and AI questions will reset to zero on this dashboard.')"
-          >
-            <button type="submit" class="btn btn-danger">Clear all</button>
-          </form>
-        </div>
         <span>Period: last ${period} days</span>
       </div>
     </div>
