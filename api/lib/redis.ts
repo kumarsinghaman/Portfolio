@@ -1,5 +1,7 @@
 const QUESTIONS_KEY = 'portfolio:chat-questions'
-const CLEARED_AT_KEY = 'portfolio:stats-cleared-at'
+const PAGEVIEWS_KEY = 'portfolio:metric:pageviews'
+const RESUME_HERO_KEY = 'portfolio:metric:resume:hero'
+const RESUME_CONTACT_KEY = 'portfolio:metric:resume:contact'
 
 async function redisCommand<T = unknown>(command: unknown[]): Promise<T | null> {
   const url = process.env.UPSTASH_REDIS_REST_URL
@@ -24,6 +26,10 @@ async function redisCommand<T = unknown>(command: unknown[]): Promise<T | null> 
   }
 }
 
+export function isRedisConfigured(): boolean {
+  return Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+}
+
 export function normalizeQuestion(text: string): string {
   return text.trim().replace(/\s+/g, ' ').slice(0, 200).toLowerCase()
 }
@@ -34,9 +40,27 @@ export async function incrementQuestionCount(question: string): Promise<void> {
   await redisCommand(['ZINCRBY', QUESTIONS_KEY, 1, normalized])
 }
 
+export async function incrementPageview(): Promise<void> {
+  await redisCommand(['INCR', PAGEVIEWS_KEY])
+}
+
+export async function incrementResumeMetric(source: 'hero' | 'contact'): Promise<void> {
+  await redisCommand(['INCR', source === 'hero' ? RESUME_HERO_KEY : RESUME_CONTACT_KEY])
+}
+
 export interface QuestionStat {
   question: string
   count: number
+}
+
+export interface MetricTraffic {
+  pageviews: number
+  events: number
+}
+
+export interface MetricResume {
+  downloads: { source: 'hero' | 'contact'; label: string; count: number }[]
+  total: number
 }
 
 export async function getTopQuestions(limit = 5): Promise<QuestionStat[]> {
@@ -59,11 +83,33 @@ export async function getTopQuestions(limit = 5): Promise<QuestionStat[]> {
   return stats
 }
 
-export async function getStatsClearedAt(): Promise<Date | null> {
-  const value = await redisCommand<string>(['GET', CLEARED_AT_KEY])
-  if (!value) return null
-  const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? null : date
+export async function getMetricTraffic(): Promise<MetricTraffic> {
+  const [pageviews, hero, contact] = await Promise.all([
+    redisCommand<string>(['GET', PAGEVIEWS_KEY]),
+    redisCommand<string>(['GET', RESUME_HERO_KEY]),
+    redisCommand<string>(['GET', RESUME_CONTACT_KEY]),
+  ])
+  const heroCount = Number(hero) || 0
+  const contactCount = Number(contact) || 0
+  return {
+    pageviews: Number(pageviews) || 0,
+    events: heroCount + contactCount,
+  }
+}
+
+export async function getMetricResume(): Promise<MetricResume> {
+  const [hero, contact] = await Promise.all([
+    redisCommand<string>(['GET', RESUME_HERO_KEY]),
+    redisCommand<string>(['GET', RESUME_CONTACT_KEY]),
+  ])
+  const downloads = [
+    { source: 'hero' as const, label: 'Hero button', count: Number(hero) || 0 },
+    { source: 'contact' as const, label: 'Contact section', count: Number(contact) || 0 },
+  ]
+  return {
+    downloads,
+    total: downloads.reduce((sum, item) => sum + item.count, 0),
+  }
 }
 
 export async function clearPortfolioStats(): Promise<{
@@ -71,14 +117,21 @@ export async function clearPortfolioStats(): Promise<{
   clearedAt: string
   configured: boolean
 }> {
-  const url = process.env.UPSTASH_REDIS_REST_URL
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN
-  if (!url || !token) {
+  if (!isRedisConfigured()) {
     return { questionsCleared: false, clearedAt: '', configured: false }
   }
 
-  const clearedAt = new Date().toISOString()
-  await redisCommand(['DEL', QUESTIONS_KEY])
-  await redisCommand(['SET', CLEARED_AT_KEY, clearedAt])
-  return { questionsCleared: true, clearedAt, configured: true }
+  await redisCommand([
+    'DEL',
+    QUESTIONS_KEY,
+    PAGEVIEWS_KEY,
+    RESUME_HERO_KEY,
+    RESUME_CONTACT_KEY,
+  ])
+
+  return {
+    questionsCleared: true,
+    clearedAt: new Date().toISOString(),
+    configured: true,
+  }
 }

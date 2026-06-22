@@ -23,6 +23,9 @@
     },
     "api/clear-stats.ts": {
       "maxDuration": 10
+    },
+    "api/track.ts": {
+      "maxDuration": 10
     }
   },
   "headers": [
