@@ -25,10 +25,10 @@ export function Stats() {
               <p className="text-3xl font-bold text-accent sm:text-4xl">
                 {stat.label === 'Per Million Events' ? (
                   <>
-                    $<AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                    $<AnimatedCounter value={stat.value} suffix={stat.suffix} active={inView} />
                   </>
                 ) : (
-                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} active={inView} />
                 )}
               </p>
               <p className="mt-2 font-mono text-xs uppercase tracking-wider text-text">

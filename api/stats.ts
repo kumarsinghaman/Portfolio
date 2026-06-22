@@ -26,6 +26,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const stats = await getPortfolioStats(periodDays)
 
+  if (req.query.debug === '1') {
+    const { probeGoatCounter } = await import('./lib/goatcounter.js')
+    return res.status(200).json({
+      ...stats,
+      goatCounterProbe: await probeGoatCounter(periodDays),
+    })
+  }
+
   res.setHeader('Cache-Control', 'private, no-store')
   return res.status(200).json(stats)
 }
