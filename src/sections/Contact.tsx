@@ -51,7 +51,7 @@ export function Contact() {
           </div>
 
           <a
-            href={publicAsset('resume.pdf')}
+            href={publicAsset(profile.resumeFile)}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded border border-accent bg-accent/10 px-6 py-3 font-mono text-sm uppercase tracking-wider text-accent transition-all hover:bg-accent/20"

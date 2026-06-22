@@ -128,7 +128,7 @@ export function Hero() {
             View Projects
           </a>
           <a
-            href={publicAsset('resume.pdf')}
+            href={publicAsset(profile.resumeFile)}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded border border-border px-6 py-3 font-mono text-sm uppercase tracking-wider text-muted transition-all hover:border-accent/40 hover:text-accent"

@@ -28,7 +28,7 @@ dist-ssr
 
 .vercel
 
-# Original resume source (public/resume.pdf is the deployed copy)
+# Legacy resume sources at repo root (deployed copy lives in public/)
 Aman_Kumar_Singh_-_Senior_Software_Engineer_v2 2.pdf
 
 # ECC extras not used in this TS/React portfolio (safe to keep locally)

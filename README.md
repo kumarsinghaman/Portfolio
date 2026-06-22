@@ -52,7 +52,7 @@ The live portfolio stays on **GitHub Pages**. Vercel only hosts `api/chat.ts` (s
 ### 3. Custom assets
 
 - **Headshot:** `public/headshot.jpg` (referenced via `publicAsset('headshot.jpg')` in `src/sections/About.tsx`).
-- **Resume:** Replace `public/resume.pdf` with an updated version.
+- **Resume:** `public/Aman_Kumar_Singh_-_Senior_Software_Engineer.pdf` (linked via `profile.resumeFile` in Hero and Contact).
 - **Project links:** Edit `src/data/profile.ts` — set `repo` and `demo` URLs on project entries.
 
 ## Project Structure
@@ -66,7 +66,7 @@ src/
 api/
   chat.ts              # Vercel serverless DeepSeek proxy
 public/
-  resume.pdf           # Downloadable resume
+  Aman_Kumar_Singh_-_Senior_Software_Engineer.pdf  # Downloadable resume
   headshot.jpg         # Profile photo
 ```
 
