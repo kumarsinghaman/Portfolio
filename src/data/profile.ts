@@ -6,6 +6,7 @@ export const profile = {
   phone: '+91 81479 97054',
   linkedin: 'https://linkedin.com/in/amanvimal',
   github: 'https://github.com/kumarsinghaman',
+  resumeFile: 'Aman_Kumar_Singh_-_Senior_Software_Engineer.pdf',
   taglines: [
     'AI/ML · Cybersecurity · XDR',
     'Generative AI · Agentic Systems',

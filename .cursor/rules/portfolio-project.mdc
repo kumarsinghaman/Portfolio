@@ -26,7 +26,7 @@ npm run verify:cursor    # validate hooks, rules, skills
 
 - Profile data: `src/data/profile.ts`
 - Chat prompt: `src/data/chatPrompt.ts`; API: `api/chat.ts` on Vercel (**API-only** — `vercel.json` skips Vite build; static site is GitHub Pages), env `GEMINI_API_KEY`
-- Resume: `public/resume.pdf`
+- Resume: `public/Aman_Kumar_Singh_-_Senior_Software_Engineer.pdf`
 
 ## Agent behavior in this repo
 

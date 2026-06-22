@@ -34,7 +34,7 @@ VITE_BASE_PATH=/Portfolio/ npm run build
 npm run preview
 ```
 
-Confirm `resume.pdf`, favicon, and headshot resolve under `/Portfolio/…`, not site root.
+Confirm `Aman_Kumar_Singh_-_Senior_Software_Engineer.pdf`, favicon, and headshot resolve under `/Portfolio/…`, not site root.
 
 ## Fix workflow
 

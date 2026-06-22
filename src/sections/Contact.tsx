@@ -4,6 +4,7 @@ import { profile } from '../data/profile'
 import { SectionHeading } from '../components/SectionHeading'
 import { useInView } from '../hooks/useInView'
 import { publicAsset } from '../utils/publicAsset'
+import { trackResumeDownload } from '../lib/analytics'
 
 export function Contact() {
   const { ref, inView } = useInView(0.2)
@@ -51,9 +52,10 @@ export function Contact() {
           </div>
 
           <a
-            href={publicAsset('resume.pdf')}
+            href={publicAsset(profile.resumeFile)}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackResumeDownload('contact')}
             className="flex items-center gap-2 rounded border border-accent bg-accent/10 px-6 py-3 font-mono text-sm uppercase tracking-wider text-accent transition-all hover:bg-accent/20"
           >
             <Download size={16} />

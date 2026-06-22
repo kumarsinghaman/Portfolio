@@ -1,4 +1,5 @@
 import { BackgroundFX } from './components/BackgroundFX'
+import { Analytics } from './components/Analytics'
 import { Nav } from './components/Nav'
 import { ChatWidget } from './components/ChatWidget'
 import { ChatProvider } from './context/ChatContext'
@@ -14,6 +15,7 @@ import { Contact } from './sections/Contact'
 function App() {
   return (
     <ChatProvider>
+      <Analytics />
       <BackgroundFX />
       <Nav />
       <main>
