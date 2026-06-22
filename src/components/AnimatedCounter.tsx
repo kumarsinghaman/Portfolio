@@ -1,11 +1,12 @@
 import { useCountUp } from '../hooks/useCountUp'
-import { useInView } from '../hooks/useInView'
+import { useReducedMotion } from '../hooks/useReducedMotion'
 
 interface AnimatedCounterProps {
   value: number
   suffix?: string
   prefix?: string
   decimals?: number
+  active?: boolean
 }
 
 export function AnimatedCounter({
@@ -13,14 +14,16 @@ export function AnimatedCounter({
   suffix = '',
   prefix = '',
   decimals = 0,
+  active = false,
 }: AnimatedCounterProps) {
-  const { ref, inView } = useInView(0.3)
-  const count = useCountUp(value, inView, 2000, decimals)
+  const reduced = useReducedMotion()
+  const count = useCountUp(value, active && !reduced, 2000, decimals)
+  const display = active && reduced ? value : count
 
   return (
-    <span ref={ref} className="tabular-nums">
+    <span className="tabular-nums">
       {prefix}
-      {decimals > 0 ? count.toFixed(decimals) : Math.round(count)}
+      {decimals > 0 ? display.toFixed(decimals) : Math.round(display)}
       {suffix}
     </span>
   )

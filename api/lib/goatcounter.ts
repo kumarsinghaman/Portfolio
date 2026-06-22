@@ -91,6 +91,39 @@ function dateRange(days: number): { start: string; end: string } {
   return { start: formatGcDate(start), end: formatGcDate(end) }
 }
 
+export async function probeGoatCounter(periodDays = 30): Promise<Record<string, unknown>> {
+  const host = apiHost()
+  const key = apiKey()
+  if (!host || !key) {
+    return { configured: false, host, hasKey: Boolean(key) }
+  }
+
+  const { start, end } = dateRange(periodDays)
+  const totalUrl = new URL(`${host}/api/v0/stats/total`)
+  totalUrl.searchParams.set('start', start)
+  totalUrl.searchParams.set('end', end)
+
+  const meUrl = `${host}/api/v0/me`
+  const headers = {
+    Authorization: `Bearer ${key}`,
+    'Content-Type': 'application/json',
+  }
+
+  const [meRes, totalRes] = await Promise.all([
+    fetch(meUrl, { headers }),
+    fetch(totalUrl, { headers }),
+  ])
+
+  return {
+    configured: true,
+    host,
+    keyLength: key.length,
+    me: { status: meRes.status, body: await meRes.text() },
+    total: { url: totalUrl.toString(), status: totalRes.status, body: await totalRes.text() },
+    range: { start, end },
+  }
+}
+
 export async function getGoatCounterTotals(periodDays = 30): Promise<GoatCounterTotals> {
   if (!isConfigured()) {
     return { pageviews: 0, events: 0, periodDays, configured: false }
