@@ -19,9 +19,17 @@ export interface GoatCounterResumeStats {
   error?: string
 }
 
+function normalizeApiHost(raw: string): string {
+  let host = raw.trim().replace(/\/$/, '')
+  // Common mistake: copying the JS snippet URL (.../count) instead of the site root.
+  host = host.replace(/\/count$/, '')
+  return host
+}
+
 function apiHost(): string | null {
-  const host = process.env.GOATCOUNTER_API_HOST?.trim().replace(/\/$/, '')
-  return host || null
+  const host = process.env.GOATCOUNTER_API_HOST?.trim()
+  if (!host) return null
+  return normalizeApiHost(host)
 }
 
 function apiKey(): string | null {
@@ -57,10 +65,21 @@ async function gcFetch<T>(path: string, params: Record<string, string | string[]
 
   if (!response.ok) {
     const text = await response.text()
+    if (response.status === 404) {
+      const hint =
+        process.env.GOATCOUNTER_API_HOST?.includes('/count')
+          ? ' GOATCOUNTER_API_HOST must be https://kumarsinghaman.goatcounter.com (no /count).'
+          : ''
+      throw new Error(`GoatCounter 404: ${text}.${hint}`)
+    }
     throw new Error(`GoatCounter ${response.status}: ${text}`)
   }
 
   return response.json() as Promise<T>
+}
+
+function formatGcDate(date: Date): string {
+  return date.toISOString().replace(/\.\d{3}Z$/, 'Z')
 }
 
 function dateRange(days: number): { start: string; end: string } {
@@ -69,7 +88,7 @@ function dateRange(days: number): { start: string; end: string } {
   start.setUTCDate(start.getUTCDate() - days)
   start.setUTCHours(0, 0, 0, 0)
   end.setUTCHours(23, 59, 59, 0)
-  return { start: start.toISOString(), end: end.toISOString() }
+  return { start: formatGcDate(start), end: formatGcDate(end) }
 }
 
 export async function getGoatCounterTotals(periodDays = 30): Promise<GoatCounterTotals> {
@@ -115,17 +134,17 @@ export async function getResumeDownloadStats(periodDays = 30): Promise<GoatCount
   try {
     const { start, end } = dateRange(periodDays)
     const data = await gcFetch<{
-      hits?: { path?: string; count?: number }[]
+      hits?: { path?: string; count?: number; event?: boolean }[]
     }>('/stats/hits', {
       start,
       end,
-      path_by_name: 'true',
-      include_paths: RESUME_PATHS.map((item) => item.path),
-      limit: '10',
+      limit: '100',
     })
 
     const hitMap = new Map(
-      (data.hits ?? []).map((hit) => [hit.path ?? '', hit.count ?? 0]),
+      (data.hits ?? [])
+        .filter((hit) => hit.event && hit.path?.startsWith('resume-download/'))
+        .map((hit) => [hit.path ?? '', hit.count ?? 0]),
     )
 
     const downloads = RESUME_PATHS.map((item) => ({
