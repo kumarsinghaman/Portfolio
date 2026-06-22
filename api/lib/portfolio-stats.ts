@@ -1,5 +1,12 @@
 import { getResumeDownloadStats, getGoatCounterTotals } from './goatcounter.js'
-import { clearPortfolioStats, getStatsClearedAt, getTopQuestions, type QuestionStat } from './redis.js'
+import {
+  clearPortfolioStats,
+  getMetricResume,
+  getMetricTraffic,
+  getTopQuestions,
+  isRedisConfigured,
+  type QuestionStat,
+} from './redis.js'
 
 export interface PortfolioStats {
   generatedAt: string
@@ -11,16 +18,34 @@ export interface PortfolioStats {
 }
 
 export async function getPortfolioStats(periodDays = 30): Promise<PortfolioStats> {
-  const clearedAt = await getStatsClearedAt()
-  const [traffic, resume, topQuestions] = await Promise.all([
-    getGoatCounterTotals(periodDays, clearedAt),
-    getResumeDownloadStats(periodDays, clearedAt),
-    getTopQuestions(5),
-  ])
+  const upstashConfigured = isRedisConfigured()
+  const topQuestions = await getTopQuestions(5)
 
-  const upstashConfigured = Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
-  )
+  if (upstashConfigured) {
+    const [traffic, resume] = await Promise.all([getMetricTraffic(), getMetricResume()])
+    return {
+      generatedAt: new Date().toISOString(),
+      periodDays,
+      traffic: {
+        pageviews: traffic.pageviews,
+        events: traffic.events,
+        periodDays,
+        configured: true,
+      },
+      resume: {
+        downloads: resume.downloads,
+        total: resume.total,
+        configured: true,
+      },
+      topQuestions,
+      upstashConfigured: true,
+    }
+  }
+
+  const [traffic, resume] = await Promise.all([
+    getGoatCounterTotals(periodDays),
+    getResumeDownloadStats(periodDays),
+  ])
 
   return {
     generatedAt: new Date().toISOString(),
@@ -28,7 +53,7 @@ export async function getPortfolioStats(periodDays = 30): Promise<PortfolioStats
     traffic,
     resume,
     topQuestions,
-    upstashConfigured,
+    upstashConfigured: false,
   }
 }
 
