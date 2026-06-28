@@ -4,14 +4,17 @@ import {
   getMetricResume,
   getMetricTraffic,
   getTopQuestions,
+  getTrafficAudience,
   isRedisConfigured,
   type QuestionStat,
+  type TrafficAudience,
 } from './redis.js'
 
 export interface PortfolioStats {
   generatedAt: string
   periodDays: number
   traffic: Awaited<ReturnType<typeof getGoatCounterTotals>>
+  trafficAudience: TrafficAudience | null
   resume: Awaited<ReturnType<typeof getResumeDownloadStats>>
   topQuestions: QuestionStat[]
   upstashConfigured: boolean
@@ -22,7 +25,11 @@ export async function getPortfolioStats(periodDays = 30): Promise<PortfolioStats
   const topQuestions = await getTopQuestions(5)
 
   if (upstashConfigured) {
-    const [traffic, resume] = await Promise.all([getMetricTraffic(), getMetricResume()])
+    const [traffic, resume, trafficAudience] = await Promise.all([
+      getMetricTraffic(),
+      getMetricResume(),
+      getTrafficAudience(),
+    ])
     return {
       generatedAt: new Date().toISOString(),
       periodDays,
@@ -32,6 +39,7 @@ export async function getPortfolioStats(periodDays = 30): Promise<PortfolioStats
         periodDays,
         configured: true,
       },
+      trafficAudience,
       resume: {
         downloads: resume.downloads,
         total: resume.total,
@@ -51,6 +59,7 @@ export async function getPortfolioStats(periodDays = 30): Promise<PortfolioStats
     generatedAt: new Date().toISOString(),
     periodDays,
     traffic,
+    trafficAudience: null,
     resume,
     topQuestions,
     upstashConfigured: false,

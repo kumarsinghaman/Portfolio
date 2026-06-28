@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { incrementPageview, incrementResumeMetric } from './lib/redis.js'
+import { incrementResumeMetric, recordPageviewVisit } from './lib/redis.js'
+import { buildPageviewMeta } from './lib/traffic-meta.js'
 
 const ALLOWED_ORIGINS = [
   'https://kumarsinghaman.github.io',
@@ -29,11 +30,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { type, source } = req.body as { type?: string; source?: string }
+  const { type, source, referrer } = req.body as {
+    type?: string
+    source?: string
+    referrer?: string
+  }
 
   try {
     if (type === 'pageview') {
-      await incrementPageview()
+      const meta = buildPageviewMeta(req, referrer)
+      await recordPageviewVisit(meta)
     } else if (type === 'resume' && (source === 'hero' || source === 'contact')) {
       await incrementResumeMetric(source)
     } else {

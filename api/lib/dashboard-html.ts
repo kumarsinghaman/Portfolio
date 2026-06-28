@@ -1,4 +1,5 @@
 import type { PortfolioStats } from './portfolio-stats.js'
+import type { TrafficBreakdownItem } from './redis.js'
 
 function escapeHtml(value: string): string {
   return value
@@ -15,6 +16,62 @@ function formatQuestion(question: string): string {
 
 function warningBlock(message: string): string {
   return `<p class="warn">${escapeHtml(message)}</p>`
+}
+
+function renderBreakdownList(items: TrafficBreakdownItem[]): string {
+  if (items.length === 0) {
+    return '<p class="muted">No data yet.</p>'
+  }
+
+  return `<ul class="breakdown-list">
+    ${items
+      .map(
+        (item) => `
+      <li>
+        <div class="breakdown-row">
+          <span class="breakdown-label">${escapeHtml(item.label)}</span>
+          <span class="breakdown-count">${item.count} · ${item.percent}%</span>
+        </div>
+        <div class="breakdown-bar" aria-hidden="true">
+          <span style="width: ${Math.min(item.percent, 100)}%"></span>
+        </div>
+      </li>`,
+      )
+      .join('')}
+  </ul>`
+}
+
+function renderTrafficAudience(stats: PortfolioStats, period: number): string {
+  const audience = stats.trafficAudience
+  if (!stats.upstashConfigured || !audience) {
+    return ''
+  }
+
+  return `
+    <details class="traffic-details">
+      <summary>Audience breakdown (${period}d)</summary>
+      <div class="traffic-details-body">
+        <div class="audience-highlight">
+          <span class="audience-label">Unique IPs</span>
+          <span class="audience-value">${audience.uniqueIps}</span>
+          <span class="audience-note">of ${audience.totalPageviews} page views</span>
+        </div>
+        <div class="breakdown-grid">
+          <div class="breakdown-card">
+            <h3>Country</h3>
+            ${renderBreakdownList(audience.countries)}
+          </div>
+          <div class="breakdown-card">
+            <h3>Referrer</h3>
+            ${renderBreakdownList(audience.referrers)}
+          </div>
+          <div class="breakdown-card">
+            <h3>Device</h3>
+            ${renderBreakdownList(audience.devices)}
+          </div>
+        </div>
+      </div>
+    </details>`
 }
 
 export function renderDashboardHtml(
@@ -39,7 +96,8 @@ export function renderDashboardHtml(
             <span class="metric-value">${stats.traffic.events}</span>
             <span class="metric-label">Events (${period}d)</span>
           </div>
-        </div>`
+        </div>
+        ${renderTrafficAudience(stats, period)}`
 
   const resumeSection = !stats.resume.configured
     ? warningBlock('GoatCounter API not configured for resume download stats.')
@@ -254,6 +312,117 @@ export function renderDashboardHtml(
         font-size: 0.9rem;
       }
       .clear-form { display: inline; margin: 0; }
+      .traffic-details {
+        margin-top: 1rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.14);
+        overflow: hidden;
+      }
+      .traffic-details summary {
+        cursor: pointer;
+        list-style: none;
+        padding: 0.85rem 1rem;
+        font-family: ui-monospace, monospace;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent2);
+      }
+      .traffic-details summary::-webkit-details-marker { display: none; }
+      .traffic-details summary::after {
+        content: '+';
+        float: right;
+        color: var(--muted);
+      }
+      .traffic-details[open] summary::after { content: '−'; }
+      .traffic-details-body {
+        padding: 0 1rem 1rem;
+        border-top: 1px solid var(--border);
+      }
+      .audience-highlight {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5rem 0.75rem;
+        margin: 1rem 0;
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.18);
+      }
+      .audience-label {
+        font-family: ui-monospace, monospace;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+      }
+      .audience-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .audience-note {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .breakdown-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.85rem;
+      }
+      .breakdown-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.85rem 1rem;
+        background: rgba(0, 0, 0, 0.12);
+      }
+      .breakdown-card h3 {
+        margin: 0 0 0.75rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .breakdown-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.65rem;
+      }
+      .breakdown-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.82rem;
+      }
+      .breakdown-label {
+        color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .breakdown-count {
+        font-family: ui-monospace, monospace;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .breakdown-bar {
+        margin-top: 0.35rem;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+      }
+      .breakdown-bar span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+      }
     </style>
   </head>
   <body>
