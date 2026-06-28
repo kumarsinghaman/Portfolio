@@ -25,7 +25,11 @@ const SESSION_PAGEVIEW_KEY = 'aks-portfolio-pageview-tracked'
 let scriptRequested = false
 const pendingDownloads: Array<'hero' | 'contact'> = []
 
-function sendPortfolioMetric(payload: { type: 'pageview' } | { type: 'resume'; source: 'hero' | 'contact' }): void {
+function sendPortfolioMetric(
+  payload:
+    | { type: 'pageview'; referrer?: string }
+    | { type: 'resume'; source: 'hero' | 'contact' },
+): void {
   if (!TRACK_API_URL) return
   void fetch(TRACK_API_URL, {
     method: 'POST',
@@ -41,7 +45,7 @@ function trackSessionPageview(): void {
   if (typeof sessionStorage === 'undefined') return
   if (sessionStorage.getItem(SESSION_PAGEVIEW_KEY)) return
   sessionStorage.setItem(SESSION_PAGEVIEW_KEY, '1')
-  sendPortfolioMetric({ type: 'pageview' })
+  sendPortfolioMetric({ type: 'pageview', referrer: document.referrer || '' })
 }
 
 function sendResumeEvent(source: 'hero' | 'contact'): void {
