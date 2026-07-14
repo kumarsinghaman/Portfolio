@@ -18,7 +18,15 @@ function warningBlock(message: string): string {
   return `<p class="warn">${escapeHtml(message)}</p>`
 }
 
-function renderBreakdownList(items: TrafficBreakdownItem[]): string {
+function metricValueHtml(value: number, metricKey: string): string {
+  return `<span class="metric-value" data-metric="${escapeHtml(metricKey)}" data-value="${value}">${value}<span class="delta" hidden></span></span>`
+}
+
+function countWithDeltaHtml(value: number, metricKey: string, suffix = ''): string {
+  return `<span class="count" data-metric="${escapeHtml(metricKey)}" data-value="${value}">${value}${escapeHtml(suffix)}<span class="delta" hidden></span></span>`
+}
+
+function renderBreakdownList(items: TrafficBreakdownItem[], group: string): string {
   if (items.length === 0) {
     return '<p class="muted">No data yet.</p>'
   }
@@ -30,7 +38,7 @@ function renderBreakdownList(items: TrafficBreakdownItem[]): string {
       <li>
         <div class="breakdown-row">
           <span class="breakdown-label">${escapeHtml(item.label)}</span>
-          <span class="breakdown-count">${item.count} · ${item.percent}%</span>
+          <span class="breakdown-count" data-metric="${escapeHtml(`${group}:${item.label}`)}" data-value="${item.count}">${item.count} · ${item.percent}%<span class="delta" hidden></span></span>
         </div>
         <div class="breakdown-bar" aria-hidden="true">
           <span style="width: ${Math.min(item.percent, 100)}%"></span>
@@ -53,21 +61,21 @@ function renderTrafficAudience(stats: PortfolioStats, period: number): string {
       <div class="traffic-details-body">
         <div class="audience-highlight">
           <span class="audience-label">Unique IPs</span>
-          <span class="audience-value">${audience.uniqueIps}</span>
+          <span class="audience-value" data-metric="uniqueIps" data-value="${audience.uniqueIps}">${audience.uniqueIps}<span class="delta" hidden></span></span>
           <span class="audience-note">of ${audience.totalPageviews} page views</span>
         </div>
         <div class="breakdown-grid">
           <div class="breakdown-card">
             <h3>Country</h3>
-            ${renderBreakdownList(audience.countries)}
+            ${renderBreakdownList(audience.countries, 'country')}
           </div>
           <div class="breakdown-card">
             <h3>Referrer</h3>
-            ${renderBreakdownList(audience.referrers)}
+            ${renderBreakdownList(audience.referrers, 'referrer')}
           </div>
           <div class="breakdown-card">
             <h3>Device</h3>
-            ${renderBreakdownList(audience.devices)}
+            ${renderBreakdownList(audience.devices, 'device')}
           </div>
         </div>
       </div>
@@ -89,11 +97,11 @@ export function renderDashboardHtml(
       : `
         <div class="metric-grid">
           <div class="metric">
-            <span class="metric-value">${stats.traffic.pageviews}</span>
+            ${metricValueHtml(stats.traffic.pageviews, 'pageviews')}
             <span class="metric-label">Page views (${period}d)</span>
           </div>
           <div class="metric">
-            <span class="metric-value">${stats.traffic.events}</span>
+            ${metricValueHtml(stats.traffic.events, 'events')}
             <span class="metric-label">Events (${period}d)</span>
           </div>
         </div>
@@ -106,14 +114,14 @@ export function renderDashboardHtml(
       : `
         <div class="metric-grid">
           <div class="metric">
-            <span class="metric-value">${stats.resume.total}</span>
+            ${metricValueHtml(stats.resume.total, 'resumeTotal')}
             <span class="metric-label">Total resume clicks</span>
           </div>
           ${stats.resume.downloads
             .map(
               (item) => `
             <div class="metric">
-              <span class="metric-value">${item.count}</span>
+              ${metricValueHtml(item.count, `resume:${item.source}`)}
               <span class="metric-label">${escapeHtml(item.label)}</span>
             </div>`,
             )
@@ -131,7 +139,7 @@ export function renderDashboardHtml(
             <li>
               <span class="rank">#${index + 1}</span>
               <span class="q">${escapeHtml(formatQuestion(item.question))}</span>
-              <span class="count">${item.count}×</span>
+              ${countWithDeltaHtml(item.count, `question:${item.question}`, '×')}
             </li>`,
             )
             .join('')}
@@ -227,7 +235,9 @@ export function renderDashboardHtml(
         background: rgba(0, 0, 0, 0.18);
       }
       .metric-value {
-        display: block;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.4rem;
         font-size: 2rem;
         font-weight: 700;
         line-height: 1;
@@ -238,6 +248,23 @@ export function renderDashboardHtml(
         margin-top: 0.45rem;
         font-size: 0.82rem;
         color: var(--muted);
+      }
+      .delta {
+        font-family: ui-monospace, monospace;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--accent);
+        background: rgba(0, 229, 160, 0.12);
+        border: 1px solid rgba(0, 229, 160, 0.35);
+        border-radius: 999px;
+        padding: 0.12rem 0.45rem;
+        line-height: 1.2;
+        animation: delta-pop 0.45s ease-out;
+      }
+      .delta[hidden] { display: none; }
+      @keyframes delta-pop {
+        from { opacity: 0; transform: translateY(4px) scale(0.92); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
       }
       .question-list {
         list-style: none;
@@ -265,6 +292,9 @@ export function renderDashboardHtml(
         font-family: ui-monospace, monospace;
         color: var(--muted);
         font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
       }
       .warn, .muted { color: var(--warn); margin: 0; }
       .muted { color: var(--muted); }
@@ -363,6 +393,9 @@ export function renderDashboardHtml(
         font-weight: 700;
         color: var(--accent);
         line-height: 1;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.4rem;
       }
       .audience-note {
         font-size: 0.82rem;
@@ -409,6 +442,9 @@ export function renderDashboardHtml(
         font-family: ui-monospace, monospace;
         color: var(--muted);
         white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
       }
       .breakdown-bar {
         margin-top: 0.35rem;
@@ -454,6 +490,49 @@ export function renderDashboardHtml(
         <span>Period: last ${period} days</span>
       </div>
     </div>
+    <script>
+      (function () {
+        var STORAGE_KEY = 'aks-portfolio-stats-snapshot';
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('cleared') === '1') {
+          try { sessionStorage.removeItem(STORAGE_KEY); } catch (err) {}
+        }
+
+        var nodes = document.querySelectorAll('[data-metric][data-value]');
+        if (!nodes.length) return;
+
+        var previous = {};
+        try {
+          previous = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}') || {};
+        } catch (err) {
+          previous = {};
+        }
+
+        var next = {};
+        nodes.forEach(function (node) {
+          var key = node.getAttribute('data-metric');
+          var value = Number(node.getAttribute('data-value') || 0);
+          if (!key) return;
+          next[key] = value;
+
+          var prev = previous[key];
+          if (typeof prev !== 'number') return;
+          var delta = value - prev;
+          if (delta <= 0) return;
+
+          var badge = node.querySelector('.delta');
+          if (!badge) return;
+          badge.textContent = '+' + delta;
+          badge.hidden = false;
+        });
+
+        try {
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        } catch (err) {
+          // Ignore quota / private-mode failures.
+        }
+      })();
+    </script>
   </body>
 </html>`
 }
